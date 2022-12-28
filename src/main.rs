@@ -1,6 +1,16 @@
-use actix_web::*;
-use actix_cors::Cors;
+#[macro_use]
+extern crate diesel;
+
 use http::header;
+
+use actix::*;
+use actix_cors::Cors;
+use actix_files::Files;
+use actix_web::{web, http, App, HttpServer};
+use diesel::{
+    prelude::*,
+    r2d2::{self, ConnectionManager},
+};
 
 mod db;
 mod models;
@@ -18,11 +28,10 @@ const CORS_MAX_REQUEST_CACHE_SEC: usize = 3600;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    todo!("Initialize server, manager, and connection pool");
-    let server;
+    let server = server::ChatServer::new().start();
     let conn_spec = "chat.db";
-    let manager;
-    let pool;
+    let manager = ConnectionManager::<SqliteConnection>::new(conn_spec);
+    let pool = r2d2::Pool::builder().build(manager).expect("Failed to create pool");
 
     let app = HttpServer::new(move || {
         let cors = Cors::default()
@@ -36,7 +45,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
     })
     .workers(AMOUNT_WORKERS)
-    .bind((SERVER_ADDRESS, SERVER_PORT)) ?
+    .bind((SERVER_ADDRESS, SERVER_PORT))?
     .run();
     println!("Running at http://{SERVER_ADDRESS}:{SERVER_PORT}");
     app.await
