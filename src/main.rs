@@ -41,8 +41,16 @@ async fn main() -> std::io::Result<()> {
             .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
             .allowed_header(header::CONTENT_TYPE)
             .max_age(CORS_MAX_REQUEST_CACHE_SEC);
-        todo!("Setup the app routes and data");
         App::new()
+            .app_data(web::Data::new(server.clone()))
+            .app_data(web::Data::new(pool.clone()))
+            .wrap(cors)
+            .service(routes::create_user)
+            .service(routes::get_user_by_id)
+            .service(routes::get_user_by_phone)
+            .service(routes::get_conversation_by_id)
+            .service(routes::get_rooms)
+            .service(Files::new("/", "./static"))
     })
     .workers(AMOUNT_WORKERS)
     .bind((SERVER_ADDRESS, SERVER_PORT))?
