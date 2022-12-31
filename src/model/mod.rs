@@ -1,3 +1,3 @@
-mod message;
-mod user;
-mod feed;
+pub mod message;
+pub mod user;
+pub mod feed;
