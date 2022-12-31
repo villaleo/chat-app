@@ -6,8 +6,7 @@ use crate::proto::{InputParcel, OutputParcel};
 use futures::stream::SplitStream;
 use futures::{future, Stream, StreamExt, TryStream, TryStreamExt};
 use uuid::Uuid;
-use warp::filters::ws::WebSocket;
-use warp::ws;
+use warp::{ filters::ws::WebSocket, ws::Message };
 
 #[derive(Clone, Copy, Default)]
 pub struct Client {
@@ -31,7 +30,7 @@ impl Client {
                 }
             )
         })
-        .map(move |msg: result::Result<ws::Message, warp::Error>| match msg {
+        .map(move |msg: result::Result<Message, warp::Error>| match msg {
             Err(err) => Err(Error::System(err.to_string())),
             Ok(msg) => {
                 // Deserialize JSON into proto::Input
@@ -46,6 +45,16 @@ impl Client {
         S: TryStream<Ok = OutputParcel, Error = E> + Stream<Item = result::Result<OutputParcel, E>>,
         E: error::Error,
     {
-        todo!()
+        let client_id = self.id;
+        stream.try_filter(move |output_parcel| {
+            // Skip irrelevant parcels
+            future::ready(output_parcel.client_id == client_id)
+        })
+        .map_ok(|output_parcel| {
+            // Serialize parcel
+            let data = serde_json::to_string(&output_parcel.output).unwrap();
+            warp::ws::Message::text(data)
+        })
+        .map_err(|err| Error::System(err.to_string()))
     }
 }
