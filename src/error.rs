@@ -5,7 +5,7 @@ use std::{
     result
 };
 
-use serde::export::Formatter;
+use serde::__private::Formatter;
 
 #[derive(Debug)]
 pub enum Error {
