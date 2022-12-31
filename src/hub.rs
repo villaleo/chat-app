@@ -133,6 +133,10 @@ impl Hub {
             self.send_error(client_id, OutputError::NameTaken);
             return;
         }
+        if !USER_NAME_REGEX.is_match(user_name) {
+            self.send_error(client_id, OutputError::InvalidName);
+            return;
+        }
 
         let user = User::new(client_id, user_name);
         self.users.write().await
