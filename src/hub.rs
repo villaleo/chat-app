@@ -121,7 +121,7 @@ impl Hub {
     async fn process(&self, input_parcel: InputParcel) {
         match input_parcel.input {
             Input::Join(input) => self.process_join(input_parcel.client_id, input).await,
-            Input::Post(input) => todo!(),
+            Input::Post(input) => self.process_post(input_parcel.client_id, input).await,
         }
     }
 
