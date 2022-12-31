@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use chat_app::hub::{Hub, HubOptions};
-use chat_app::proto::InputParcel;
+use crate::hub::{ Hub, HubOptions };
+use crate::proto::InputParcel;
 
 use futures::{StreamExt, TryStreamExt};
 use log::{error, info};
