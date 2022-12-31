@@ -1,11 +1,11 @@
 use std::{ collections::HashMap, time::Duration };
-use chrono::Utc;
 
 use crate::{
     proto::*,
     model::{ feed::Feed, user::User },
 };
 
+use chrono::Utc;
 use futures::StreamExt;
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -20,8 +20,8 @@ use tokio::{
 use uuid::Uuid;
 use crate::model::message::Message;
 
-const OUTPUT_CHANNEL_SIZE: usize = 16;
 const MAX_MESSAGE_BODY_LENGTH: usize = 256;
+const OUTPUT_CHANNEL_SIZE: usize = 16;
 
 lazy_static! {
     static ref USER_NAME_REGEX: Regex = Regex::new("[A-Za-z\\s]{4,24}").unwrap();
